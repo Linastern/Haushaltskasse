@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HaushaltsKasse</title>
+  <style>
+/* ============================================================
+   HaushaltsKasse – style.css
+   Ästhetik: Warm, modern, organisch – wie ein schönes Notizbuch
+   ============================================================ */
+
+/* ---------- CSS-Variablen / Design-System ---------- */
+:root {
+  --bg:          #faf7f2;
+  --surface:     #ffffff;
+  --surface-2:   #f3ede4;
+  --accent:      #c96a2e;
+  --accent-soft: #f0ddd0;
+  --green:       #3a8c6e;
+  --green-soft:  #d4ede5;
+  --red:         #c0392b;
+  --red-soft:    #fde8e6;
+  --ink:         #1e1610;
+  --ink-mid:     #5a4a3a;
+  --ink-light:   #9e8c7c;
+  --border:      #e5ddd4;
+  --shadow:      0 4px 24px rgba(120,80,40,0.10);
+  --radius:      16px;
+  --radius-sm:   8px;
+  --font-display: Georgia, serif;
+  --font-body: system-ui, -apple-system, sans-serif;
+  --budget:       400;
+}
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ---------- Screens ---------- */
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 0 0 60px;
+  animation: fadeIn 0.35s ease;
+}
+.screen.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   SCREEN 1 – LOGIN
+   ============================================================ */
+.login-bg-blob {
+  position: fixed;
+  top: -120px; right: -120px;
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, #f0ddd0 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-header {
+  position: relative;
+  z-index: 2;
+  padding: 48px 32px 24px;
+  text-align: center;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+}
+
+.tagline {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: var(--ink-mid);
+  font-weight: 300;
+}
+
+.profile-grid-section {
+  position: relative;
+  z-index: 2;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.btn-add-profile {
+  position: relative;
+  z-index: 3;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.section-hint {
+  font-size: 0.875rem;
+  color: var(--ink-light);
+  margin-top: -12px;
+  margin-bottom: 20px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* einzelne Profilkarte */
+.profile-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  box-shadow: var(--shadow);
+}
+.profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(120,80,40,0.16);
+  border-color: var(--accent);
+}
+
+/* Roter Rand = offene Schulden */
+.profile-card.has-debt {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(192,57,43,0.18), var(--shadow);
+}
+.profile-card.has-debt .profile-avatar {
+  outline: 3px solid var(--red);
+}
+
+/* Grüner Rand = Guthaben vorhanden */
+.profile-card.has-credit {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(58,140,110,0.18), var(--shadow);
+}
+
+.profile-avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.profile-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+}
+
+.profile-badge {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+.profile-badge.debt  { background: var(--red-soft);   color: var(--red); }
+.profile-badge.credit { background: var(--green-soft); color: var(--green); }
+.profile-badge.even  { background: var(--surface-2);  color: var(--ink-light); }
+
+.btn-add-profile {
+  width: 100%;
+  background: var(--surface);
+  border: 2px dashed var(--accent);
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-add-profile:hover {
+  background: var(--accent-soft);
+}
+.plus-icon { font-size: 1.2rem; }
+
+/* ============================================================
+   SCREEN 2 – PROFIL ERSTELLEN
+   ============================================================ */
+.modal-card {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 36px 32px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  margin-bottom: 28px;
+  color: var(--ink);
+}
+
+.label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-mid);
+  margin-bottom: 10px;
+}
+
+.avatar-picker { margin-bottom: 28px; }
+
+.avatar-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.avatar-option {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 3px solid transparent;
+  font-size: 1.6rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.avatar-option:hover  { transform: scale(1.1); }
+.avatar-option.selected { border-color: var(--accent); }
+
+.upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.btn-upload {
+  display: inline-block;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  color: var(--ink-mid);
+  transition: background 0.2s;
+}
+.btn-upload:hover { background: var(--accent-soft); }
+
+#avatar-preview {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: none;
+  border: 2px solid var(--accent);
+}
+
+.form-group { margin-bottom: 24px; }
+
+.text-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--bg);
+  transition: border-color 0.2s;
+  outline: none;
+}
+.text-input:focus { border-color: var(--accent); }
+
+.budget-display {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--ink-light);
+  margin-top: 4px;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  margin-top: 4px;
+}
+.btn-primary:hover  { background: #a85520; }
+.btn-primary:active { transform: scale(0.98); }
+
+.error-msg {
+  color: var(--red);
+  font-size: 0.85rem;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* ============================================================
+   SCREEN 3 – DASHBOARD
+   ============================================================ */
+.dash-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dash-user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dash-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  font-size: 1.8rem;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border: 3px solid var(--accent);
+  flex-shrink: 0;
+}
+.dash-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.dash-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--ink);
+}
+
+.dash-budget-label {
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.dash-budget-bar-wrap {
+  margin-top: 4px;
+  width: 200px;
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.dash-budget-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+  width: 100%;
+}
+
+.dash-budget-amount {
+  font-size: 0.82rem;
+  color: var(--ink-mid);
+  margin-top: 3px;
+}
+
+.btn-logout {
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink-mid);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-logout:hover { background: var(--red-soft); color: var(--red); }
+
+.dash-main {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+/* Mitglieder-Karte (ähnlich Profilkarte, aber im Dashboard) */
+.member-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.member-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(120,80,40,0.16);
+  border-color: var(--accent);
+}
+.member-card.in-debt {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(192,57,43,0.18), var(--shadow);
+}
+.member-card.has-credit {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(58,140,110,0.18), var(--shadow);
+}
+
+.member-notify-dot {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--red);
+  display: none;
+}
+.member-card.in-debt .member-notify-dot { display: block; }
+
+/* Gesamt-Bilanz Box */
+.dash-summary-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  padding: 24px 28px;
+  box-shadow: var(--shadow);
+}
+
+.summary-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--ink-mid);
+  margin-bottom: 10px;
+}
+
+.summary-balance {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  color: var(--ink);
+}
+.summary-balance.positive { color: var(--green); }
+.summary-balance.negative { color: var(--red); }
+
+.summary-desc {
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  margin-top: 6px;
+}
+
+/* ============================================================
+   SCREEN 4 – DETAIL
+   ============================================================ */
+.detail-wrap {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0 28px;
+}
+
+.detail-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  font-size: 2.2rem;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border: 3px solid var(--border);
+}
+.detail-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.detail-name {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--ink);
+}
+
+.detail-balance-chip {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.detail-balance-chip.positive { background: var(--green-soft); color: var(--green); }
+.detail-balance-chip.negative { background: var(--red-soft);   color: var(--red); }
+.detail-balance-chip.neutral  { background: var(--surface-2);  color: var(--ink-light); }
+
+/* Tabs */
+.tab-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-mid);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab-btn:hover    { border-color: var(--accent); color: var(--accent); }
+.tab-btn.active   { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.tab-content       { display: none; }
+.tab-content.active { display: block; }
+
+.tab-desc {
+  font-size: 0.88rem;
+  color: var(--ink-mid);
+  margin-bottom: 14px;
+}
+
+/* Eintrags-Liste */
+.entry-list {
+  list-style: none;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entry-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.entry-num {
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  min-width: 18px;
+}
+
+.entry-note {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--ink-mid);
+}
+
+.entry-amount {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.entry-amount.debt   { color: var(--red); }
+.entry-amount.credit { color: var(--green); }
+
+.entry-delete {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--ink-light);
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+.entry-delete:hover { color: var(--red); background: var(--red-soft); }
+
+/* Formular für neuen Eintrag */
+.add-entry-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.num-input {
+  width: 120px;
+  padding: 10px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.num-input:focus { border-color: var(--accent); }
+
+.text-input-sm {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.text-input-sm:focus { border-color: var(--accent); }
+
+.btn-add-entry {
+  background: var(--accent-soft);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.btn-add-entry:hover { background: var(--accent); color: #fff; }
+
+.entry-total {
+  font-size: 0.9rem;
+  color: var(--ink-mid);
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+.entry-total span { font-weight: 700; color: var(--ink); }
+
+/* Netto-Bilanz */
+.net-balance-box {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.net-label { font-weight: 600; color: var(--ink-mid); font-size: 0.95rem; }
+.net-amount {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--ink);
+}
+.net-amount.positive { color: var(--green); }
+.net-amount.negative { color: var(--red); }
+
+/* Informieren Button */
+.btn-inform {
+  width: 100%;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  margin-bottom: 10px;
+}
+.btn-inform:hover  { background: var(--accent); }
+.btn-inform:active { transform: scale(0.98); }
+
+.inform-hint {
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  text-align: center;
+  min-height: 20px;
+}
+
+/* ---------- Zurück-Button ---------- */
+.btn-back {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-mid);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+.btn-back:hover { color: var(--accent); }
+
+/* ---------- Toast Notification ---------- */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 99px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+  transition: transform 0.35s ease, opacity 0.35s ease;
+  opacity: 0;
+  z-index: 999;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+  .dash-budget-bar-wrap { width: 140px; }
+  .modal-card { margin: 16px; padding: 24px 20px; }
+  .detail-wrap { padding: 20px 16px; }
+  .add-entry-form { flex-direction: column; }
+  .num-input { width: 100%; }
+}
+
+</style>
+  
+</head>
+<body>
+
+  <!-- ===== SCREEN 1: LOGIN / PROFIL AUSWÄHLEN ===== -->
+  <div id="screen-login" class="screen active">
+    <div class="login-bg-blob"></div>
+    <header class="app-header">
+      <div class="logo">🛒 HaushaltsKasse</div>
+      <p class="tagline">Wer hat für wen eingekauft?</p>
+    </header>
+
+    <section class="profile-grid-section">
+      <h2 class="section-title">Wer bist du?</h2>
+      <div id="profile-list" class="profile-grid"></div>
+      <button class="btn-add-profile" id="btn-open-create-profile">
+        <span class="plus-icon">＋</span> Neues Profil erstellen
+      </button>
+    </section>
+  </div>
+
+  <!-- ===== SCREEN 2: PROFIL ERSTELLEN ===== -->
+  <div id="screen-create-profile" class="screen">
+    <div class="modal-card">
+      <button class="btn-back" id="btn-back-from-create">← Zurück</button>
+      <h2 class="modal-title">Profil erstellen</h2>
+
+      <div class="avatar-picker" id="avatar-picker">
+        <p class="label">Wähle dein Bild:</p>
+        <div class="avatar-options">
+          <div class="avatar-option selected" data-emoji="🧑" tabindex="0">🧑</div>
+          <div class="avatar-option" data-emoji="👩" tabindex="0">👩</div>
+          <div class="avatar-option" data-emoji="👨" tabindex="0">👨</div>
+          <div class="avatar-option" data-emoji="🧒" tabindex="0">🧒</div>
+          <div class="avatar-option" data-emoji="👴" tabindex="0">👴</div>
+          <div class="avatar-option" data-emoji="👵" tabindex="0">👵</div>
+          <div class="avatar-option" data-emoji="🧑‍🍳" tabindex="0">🧑‍🍳</div>
+          <div class="avatar-option" data-emoji="🧑‍💻" tabindex="0">🧑‍💻</div>
+        </div>
+        <div class="upload-wrapper">
+          <label for="avatar-upload" class="btn-upload">📷 Eigenes Bild hochladen</label>
+          <input type="file" id="avatar-upload" accept="image/*" hidden />
+          <img id="avatar-preview" src="" alt="" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="profile-name-input" class="label">Dein Name:</label>
+        <input type="text" id="profile-name-input" class="text-input" placeholder="z.B. Anna" maxlength="20" />
+      </div>
+
+      <div class="form-group">
+        <label class="label">Monatsbudget:</label>
+        <div class="budget-display">400,00 €</div>
+        <p class="hint">Das Budget ist für alle auf 400 € festgelegt.</p>
+      </div>
+
+      <button class="btn-primary" id="btn-save-profile">Profil speichern ✓</button>
+      <p id="create-profile-error" class="error-msg"></p>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 3: DASHBOARD (eigenes Profil aktiv) ===== -->
+  <div id="screen-dashboard" class="screen">
+    <header class="dash-header">
+      <div class="dash-user-info">
+        <div class="dash-avatar" id="dash-avatar"></div>
+        <div>
+          <div class="dash-name" id="dash-name"></div>
+          <div class="dash-budget-label">Budget diesen Monat</div>
+          <div class="dash-budget-bar-wrap">
+            <div class="dash-budget-bar" id="dash-budget-bar"></div>
+          </div>
+          <div class="dash-budget-amount" id="dash-budget-amount"></div>
+        </div>
+      </div>
+      <button class="btn-logout" id="btn-logout">Abmelden</button>
+    </header>
+
+    <main class="dash-main">
+      <h2 class="section-title">Haushaltsmitglieder</h2>
+      <p class="section-hint">Klicke auf eine Person, um Schulden oder Guthaben einzutragen.</p>
+      <div id="members-grid" class="members-grid"></div>
+
+      <div class="dash-summary-box">
+        <h3 class="summary-title">Deine Gesamtbilanz</h3>
+        <div id="dash-total-balance" class="summary-balance">0,00 €</div>
+        <p id="dash-balance-desc" class="summary-desc"></p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== SCREEN 4: DETAIL – Schulden / Guthaben ===== -->
+  <div id="screen-detail" class="screen">
+    <div class="detail-wrap">
+      <button class="btn-back" id="btn-back-from-detail">← Zurück</button>
+
+      <div class="detail-header">
+        <div class="detail-avatar" id="detail-avatar"></div>
+        <div>
+          <div class="detail-name" id="detail-name"></div>
+          <div class="detail-balance-chip" id="detail-balance-chip"></div>
+        </div>
+      </div>
+
+      <!-- Tab-Auswahl -->
+      <div class="tab-row">
+        <button class="tab-btn active" id="tab-schulden" data-tab="schulden">💸 Schulden</button>
+        <button class="tab-btn" id="tab-guthaben" data-tab="guthaben">💰 Guthaben</button>
+      </div>
+
+      <!-- Tab: Schulden -->
+      <div class="tab-content active" id="content-schulden">
+        <p class="tab-desc">Beträge, die <strong id="schulden-ich-label"></strong> dieser Person schulde:</p>
+        <ul class="entry-list" id="schulden-list"></ul>
+        <div class="add-entry-form">
+          <input type="number" id="schulden-amount" class="num-input" placeholder="Betrag in €" min="0" step="0.01" />
+          <input type="text" id="schulden-note" class="text-input-sm" placeholder="Notiz (z.B. Tomaten)" maxlength="40" />
+          <button class="btn-add-entry" id="btn-add-schulden">＋ Hinzufügen</button>
+        </div>
+        <div class="entry-total">
+          Gesamt Schulden: <span id="schulden-total">0,00 €</span>
+        </div>
+      </div>
+
+      <!-- Tab: Guthaben -->
+      <div class="tab-content" id="content-guthaben">
+        <p class="tab-desc">Beträge, die diese Person <strong id="guthaben-ich-label"></strong> schuldet (mein Guthaben):</p>
+        <ul class="entry-list" id="guthaben-list"></ul>
+        <div class="add-entry-form">
+          <input type="number" id="guthaben-amount" class="num-input" placeholder="Betrag in €" min="0" step="0.01" />
+          <input type="text" id="guthaben-note" class="text-input-sm" placeholder="Notiz (z.B. Toast)" maxlength="40" />
+          <button class="btn-add-entry" id="btn-add-guthaben">＋ Hinzufügen</button>
+        </div>
+        <div class="entry-total">
+          Gesamt Guthaben: <span id="guthaben-total">0,00 €</span>
+        </div>
+      </div>
+
+      <div class="net-balance-box" id="net-balance-box">
+        <span class="net-label">Netto-Bilanz:</span>
+        <span class="net-amount" id="net-amount">0,00 €</span>
+      </div>
+
+      <!-- Informieren Button -->
+      <button class="btn-inform" id="btn-inform">📣 Informieren</button>
+      <div class="inform-hint" id="inform-hint"></div>
+    </div>
+  </div>
+
+  <!-- ===== NOTIFICATION TOAST ===== -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+/* ============================================================
+   HaushaltsKasse – app.js   (bugfixed version)
+   ============================================================ */
+
+'use strict';
+
+// ─── Datenschicht ────────────────────────────────────────────
+var DB_KEY = 'haushaltskasse_v1';
+
+function loadDB() {
+  try {
+    var raw = localStorage.getItem(DB_KEY);
+    return raw ? JSON.parse(raw) : { profiles: [], transactions: {} };
+  } catch(e) {
+    return { profiles: [], transactions: {} };
+  }
+}
+
+function saveDB(db) {
+  try {
+    localStorage.setItem(DB_KEY, JSON.stringify(db));
+  } catch(e) {
+    console.warn('LocalStorage nicht verfügbar:', e);
+  }
+}
+
+function fmtEuro(num) {
+  return num.toFixed(2).replace('.', ',') + ' \u20ac';
+}
+
+// ─── State ───────────────────────────────────────────────────
+var db              = { profiles: [], transactions: {} };
+var activeProfileId = null;
+var targetProfileId = null;
+var activeTab       = 'schulden';
+var selectedEmoji   = '🧑';
+var uploadedAvatarData = null;
+
+// ─── Alles startet erst wenn DOM fertig ist ──────────────────
+document.addEventListener('DOMContentLoaded', function() {
+
+  // ─── Screens ─────────────────────────────────────────────
+  var screens = {
+    login:         document.getElementById('screen-login'),
+    createProfile: document.getElementById('screen-create-profile'),
+    dashboard:     document.getElementById('screen-dashboard'),
+    detail:        document.getElementById('screen-detail')
+  };
+
+  function showScreen(name) {
+    Object.keys(screens).forEach(function(k) {
+      screens[k].classList.remove('active');
+    });
+    if (screens[name]) {
+      screens[name].classList.add('active');
+    }
+    window.scrollTo(0, 0);
+  }
+
+  // ─── Toast ───────────────────────────────────────────────
+  var toastEl    = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg, duration) {
+    duration = duration || 2800;
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() {
+      toastEl.classList.remove('show');
+    }, duration);
+  }
+
+  // ─── SCREEN 1: LOGIN ────────────────────────────────────
+  function renderLoginProfiles() {
+    var grid = document.getElementById('profile-list');
+    grid.innerHTML = '';
+    db.profiles.forEach(function(p) {
+      var card = document.createElement('div');
+      card.className  = 'profile-card';
+      card.dataset.id = p.id;
+
+      var avatar = buildAvatar(p, 64);
+      var nameEl = document.createElement('div');
+      nameEl.className   = 'profile-name';
+      nameEl.textContent = p.name;
+
+      card.appendChild(avatar);
+      card.appendChild(nameEl);
+      card.addEventListener('click', function() { loginAs(p.id); });
+      grid.appendChild(card);
+    });
+  }
+
+  function loginAs(profileId) {
+    activeProfileId = profileId;
+    checkNotifications(profileId);
+    renderDashboard();
+    showScreen('dashboard');
+  }
+
+  // ─── SCREEN 2: PROFIL ERSTELLEN ──────────────────────────
+  document.getElementById('btn-open-create-profile').addEventListener('click', function() {
+    resetCreateForm();
+    showScreen('createProfile');
+  });
+
+  document.getElementById('btn-back-from-create').addEventListener('click', function() {
+    showScreen('login');
+  });
+
+  // Emoji-Auswahl
+  document.getElementById('avatar-picker').querySelectorAll('.avatar-option').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      document.querySelectorAll('.avatar-option').forEach(function(o) {
+        o.classList.remove('selected');
+      });
+      opt.classList.add('selected');
+      selectedEmoji      = opt.dataset.emoji;
+      uploadedAvatarData = null;
+      document.getElementById('avatar-preview').style.display = 'none';
+    });
+  });
+
+  // Bild hochladen
+  document.getElementById('avatar-upload').addEventListener('change', function() {
+    var file = this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      uploadedAvatarData = e.target.result;
+      var prev = document.getElementById('avatar-preview');
+      prev.src           = uploadedAvatarData;
+      prev.style.display = 'block';
+      document.querySelectorAll('.avatar-option').forEach(function(o) {
+        o.classList.remove('selected');
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Profil speichern
+  document.getElementById('btn-save-profile').addEventListener('click', function() {
+    var name    = document.getElementById('profile-name-input').value.trim();
+    var errorEl = document.getElementById('create-profile-error');
+    errorEl.textContent = '';
+
+    if (!name) {
+      errorEl.textContent = 'Bitte gib einen Namen ein.';
+      return;
+    }
+    var duplicate = db.profiles.some(function(p) {
+      return p.name.toLowerCase() === name.toLowerCase();
+    });
+    if (duplicate) {
+      errorEl.textContent = 'Dieser Name ist bereits vergeben.';
+      return;
+    }
+
+    var newProfile = {
+      id:        'p_' + Date.now(),
+      name:      name,
+      emoji:     uploadedAvatarData ? null : selectedEmoji,
+      avatarImg: uploadedAvatarData || null,
+      createdAt: Date.now()
+    };
+
+    db.profiles.push(newProfile);
+    saveDB(db);
+    showToast('Profil "' + name + '" erstellt!');
+    renderLoginProfiles();
+    showScreen('login');
+  });
+
+  function resetCreateForm() {
+    document.getElementById('profile-name-input').value        = '';
+    document.getElementById('create-profile-error').textContent = '';
+    selectedEmoji      = '🧑';
+    uploadedAvatarData = null;
+    document.getElementById('avatar-preview').style.display = 'none';
+    document.querySelectorAll('.avatar-option').forEach(function(o, i) {
+      o.classList.toggle('selected', i === 0);
+    });
+  }
+
+  // ─── SCREEN 3: DASHBOARD ────────────────────────────────
+  function renderDashboard() {
+    var me = getProfile(activeProfileId);
+    if (!me) return;
+
+    var dashAvatarEl = document.getElementById('dash-avatar');
+    dashAvatarEl.innerHTML = '';
+    dashAvatarEl.appendChild(buildAvatar(me, 56));
+    document.getElementById('dash-name').textContent = me.name;
+
+    var totalSpent = getTotalSpentThisMonth(activeProfileId);
+    var budget     = 400;
+    var remaining  = Math.max(0, budget - totalSpent);
+    var pct        = Math.min(100, (remaining / budget) * 100);
+    var bar        = document.getElementById('dash-budget-bar');
+    bar.style.width      = pct + '%';
+    bar.style.background = pct > 40 ? 'var(--accent)' : pct > 15 ? '#d4a04a' : 'var(--red)';
+    document.getElementById('dash-budget-amount').textContent =
+      fmtEuro(remaining) + ' verbleibend von ' + fmtEuro(budget);
+
+    var membersGrid = document.getElementById('members-grid');
+    membersGrid.innerHTML = '';
+    var others = db.profiles.filter(function(p) { return p.id !== activeProfileId; });
+
+    if (others.length === 0) {
+      membersGrid.innerHTML = '<p style="color:var(--ink-light);font-size:0.9rem;">Noch keine anderen Mitglieder. Erstelle weitere Profile!</p>';
+    }
+
+    others.forEach(function(p) {
+      var net  = getNetBalance(activeProfileId, p.id);
+      var card = document.createElement('div');
+      card.className = 'member-card';
+      if (net < -0.005)     card.classList.add('in-debt');
+      else if (net > 0.005) card.classList.add('has-credit');
+
+      var dot = document.createElement('div');
+      dot.className = 'member-notify-dot';
+
+      var avatar = buildAvatar(p, 64);
+      var nameEl = document.createElement('div');
+      nameEl.className   = 'profile-name';
+      nameEl.textContent = p.name;
+
+      var badge = document.createElement('div');
+      badge.className = 'profile-badge';
+      if (net > 0.005) {
+        badge.classList.add('credit');
+        badge.textContent = '+' + fmtEuro(net);
+      } else if (net < -0.005) {
+        badge.classList.add('debt');
+        badge.textContent = fmtEuro(net);
+      } else {
+        badge.classList.add('even');
+        badge.textContent = 'Ausgeglichen';
+      }
+
+      card.appendChild(dot);
+      card.appendChild(avatar);
+      card.appendChild(nameEl);
+      card.appendChild(badge);
+      card.addEventListener('click', function() { openDetail(p.id); });
+      membersGrid.appendChild(card);
+    });
+
+    var totalNet  = others.reduce(function(sum, p) {
+      return sum + getNetBalance(activeProfileId, p.id);
+    }, 0);
+    var balanceEl = document.getElementById('dash-total-balance');
+    balanceEl.textContent = (totalNet >= 0 ? '+' : '') + fmtEuro(totalNet);
+    balanceEl.className   = 'summary-balance' +
+      (totalNet > 0.005 ? ' positive' : totalNet < -0.005 ? ' negative' : '');
+    document.getElementById('dash-balance-desc').textContent =
+      totalNet > 0.005  ? 'Du bekommst insgesamt noch Geld.' :
+      totalNet < -0.005 ? 'Du schuldest insgesamt noch Geld.' :
+                          'Alles ausgeglichen - super!';
+  }
+
+  document.getElementById('btn-logout').addEventListener('click', function() {
+    activeProfileId = null;
+    renderLoginProfiles();
+    showScreen('login');
+  });
+
+  // ─── SCREEN 4: DETAIL ───────────────────────────────────
+  function openDetail(profileId) {
+    targetProfileId = profileId;
+    activeTab = 'schulden';
+    switchTab('schulden');
+    renderDetail();
+    showScreen('detail');
+  }
+
+  function renderDetail() {
+    var me     = getProfile(activeProfileId);
+    var target = getProfile(targetProfileId);
+    if (!me || !target) return;
+
+    var dAvatar = document.getElementById('detail-avatar');
+    dAvatar.innerHTML = '';
+    dAvatar.appendChild(buildAvatar(target, 72));
+    document.getElementById('detail-name').textContent        = target.name;
+    document.getElementById('schulden-ich-label').textContent = me.name;
+    document.getElementById('guthaben-ich-label').textContent = me.name;
+
+    var net  = getNetBalance(activeProfileId, targetProfileId);
+    var chip = document.getElementById('detail-balance-chip');
+    if (net > 0.005) {
+      chip.textContent = target.name + ' schuldet mir ' + fmtEuro(net);
+      chip.className   = 'detail-balance-chip positive';
+    } else if (net < -0.005) {
+      chip.textContent = 'Ich schulde ' + target.name + ' ' + fmtEuro(Math.abs(net));
+      chip.className   = 'detail-balance-chip negative';
+    } else {
+      chip.textContent = 'Ausgeglichen';
+      chip.className   = 'detail-balance-chip neutral';
+    }
+
+    renderSchuldenList();
+    renderGuthabenList();
+    updateNetBalance();
+    document.getElementById('inform-hint').textContent = '';
+  }
+
+  function renderSchuldenList() {
+    var list  = getEntries('schulden', activeProfileId, targetProfileId);
+    var ul    = document.getElementById('schulden-list');
+    ul.innerHTML = '';
+    var total = 0;
+    list.forEach(function(entry, i) {
+      total += entry.amount;
+      ul.appendChild(buildEntryItem(entry, i + 1, 'debt', function() {
+        deleteEntry('schulden', activeProfileId, targetProfileId, entry.id);
+        renderDetail();
+      }));
+    });
+    document.getElementById('schulden-total').textContent = fmtEuro(total);
+  }
+
+  function renderGuthabenList() {
+    var list  = getEntries('guthaben', activeProfileId, targetProfileId);
+    var ul    = document.getElementById('guthaben-list');
+    ul.innerHTML = '';
+    var total = 0;
+    list.forEach(function(entry, i) {
+      total += entry.amount;
+      ul.appendChild(buildEntryItem(entry, i + 1, 'credit', function() {
+        deleteEntry('guthaben', activeProfileId, targetProfileId, entry.id);
+        renderDetail();
+      }));
+    });
+    document.getElementById('guthaben-total').textContent = fmtEuro(total);
+  }
+
+  function buildEntryItem(entry, num, type, onDelete) {
+    var li = document.createElement('li');
+    li.className = 'entry-item';
+
+    var numEl = document.createElement('span');
+    numEl.className   = 'entry-num';
+    numEl.textContent = num + '.';
+
+    var noteEl = document.createElement('span');
+    noteEl.className   = 'entry-note';
+    noteEl.textContent = entry.note || '-';
+
+    var amtEl = document.createElement('span');
+    amtEl.className   = 'entry-amount ' + type;
+    amtEl.textContent = fmtEuro(entry.amount);
+
+    var dateEl = document.createElement('span');
+    dateEl.style.cssText  = 'font-size:0.72rem;color:var(--ink-light);min-width:50px;text-align:right;';
+    dateEl.textContent = new Date(entry.createdAt).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+
+    var delBtn = document.createElement('button');
+    delBtn.className   = 'entry-delete';
+    delBtn.title       = 'Loeschen';
+    delBtn.textContent = 'x';
+    delBtn.addEventListener('click', onDelete);
+
+    li.appendChild(numEl);
+    li.appendChild(noteEl);
+    li.appendChild(amtEl);
+    li.appendChild(dateEl);
+    li.appendChild(delBtn);
+    return li;
+  }
+
+  function updateNetBalance() {
+    var net = getNetBalance(activeProfileId, targetProfileId);
+    var el  = document.getElementById('net-amount');
+    el.textContent = (net >= 0 ? '+' : '') + fmtEuro(net);
+    el.className   = 'net-amount' +
+      (net > 0.005 ? ' positive' : net < -0.005 ? ' negative' : '');
+  }
+
+  document.getElementById('btn-add-schulden').addEventListener('click', function() {
+    var amt  = parseFloat(document.getElementById('schulden-amount').value);
+    var note = document.getElementById('schulden-note').value.trim();
+    if (!amt || amt <= 0) { showToast('Bitte einen gueltigen Betrag eingeben.'); return; }
+    addEntry('schulden', activeProfileId, targetProfileId, amt, note);
+    document.getElementById('schulden-amount').value = '';
+    document.getElementById('schulden-note').value   = '';
+    renderDetail();
+    showToast('Schulden-Eintrag hinzugefuegt.');
+  });
+
+  document.getElementById('btn-add-guthaben').addEventListener('click', function() {
+    var amt  = parseFloat(document.getElementById('guthaben-amount').value);
+    var note = document.getElementById('guthaben-note').value.trim();
+    if (!amt || amt <= 0) { showToast('Bitte einen gueltigen Betrag eingeben.'); return; }
+    addEntry('guthaben', activeProfileId, targetProfileId, amt, note);
+    document.getElementById('guthaben-amount').value = '';
+    document.getElementById('guthaben-note').value   = '';
+    renderDetail();
+    showToast('Guthaben-Eintrag hinzugefuegt.');
+  });
+
+  document.getElementById('tab-schulden').addEventListener('click', function() { switchTab('schulden'); });
+  document.getElementById('tab-guthaben').addEventListener('click', function() { switchTab('guthaben'); });
+
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.tab === tab);
+    });
+    document.getElementById('content-schulden').classList.toggle('active', tab === 'schulden');
+    document.getElementById('content-guthaben').classList.toggle('active', tab === 'guthaben');
+  }
+
+  document.getElementById('btn-inform').addEventListener('click', function() {
+    var target = getProfile(targetProfileId);
+    var me     = getProfile(activeProfileId);
+    if (!target || !me) return;
+
+    var net      = getNetBalance(activeProfileId, targetProfileId);
+    var notifKey = 'notif_' + targetProfileId;
+    var notifs   = [];
+    try { notifs = JSON.parse(localStorage.getItem(notifKey) || '[]'); } catch(e) {}
+    notifs.push({ from: me.name, fromId: activeProfileId, net: net, ts: Date.now() });
+    try { localStorage.setItem(notifKey, JSON.stringify(notifs)); } catch(e) {}
+
+    var msg = net > 0
+      ? target.name + ' wurde informiert, dass er/sie dir ' + fmtEuro(net) + ' schuldet.'
+      : net < 0
+      ? target.name + ' wurde informiert, dass du ihm/ihr ' + fmtEuro(Math.abs(net)) + ' schuldest.'
+      : target.name + ' wurde informiert. Die Bilanz ist ausgeglichen.';
+
+    document.getElementById('inform-hint').textContent = 'Gesendet: ' + msg;
+    showToast(target.name + ' wurde informiert!');
+  });
+
+  document.getElementById('btn-back-from-detail').addEventListener('click', function() {
+    renderDashboard();
+    showScreen('dashboard');
+  });
+
+  // ─── Datenzugriff ────────────────────────────────────────
+  function getProfile(id) {
+    for (var i = 0; i < db.profiles.length; i++) {
+      if (db.profiles[i].id === id) return db.profiles[i];
+    }
+    return null;
+  }
+
+  function txKey(type, fromId, toId) {
+    return type + '__' + fromId + '__' + toId;
+  }
+
+  function getEntries(type, fromId, toId) {
+    return db.transactions[txKey(type, fromId, toId)] || [];
+  }
+
+  function addEntry(type, fromId, toId, amount, note) {
+    var key = txKey(type, fromId, toId);
+    if (!db.transactions[key]) db.transactions[key] = [];
+    db.transactions[key].push({
+      id:        'e_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      amount:    amount,
+      note:      note,
+      createdAt: Date.now()
+    });
+    saveDB(db);
+  }
+
+  function deleteEntry(type, fromId, toId, entryId) {
+    var key = txKey(type, fromId, toId);
+    if (!db.transactions[key]) return;
+    db.transactions[key] = db.transactions[key].filter(function(e) { return e.id !== entryId; });
+    saveDB(db);
+  }
+
+  function getNetBalance(meId, otherId) {
+    var myCredit    = sumEntries(getEntries('guthaben', meId, otherId));
+    var myDebt      = sumEntries(getEntries('schulden', meId, otherId));
+    var otherCredit = sumEntries(getEntries('guthaben', otherId, meId));
+    var otherDebt   = sumEntries(getEntries('schulden', otherId, meId));
+    return (myCredit + otherDebt) - (myDebt + otherCredit);
+  }
+
+  function sumEntries(entries) {
+    return entries.reduce(function(s, e) { return s + e.amount; }, 0);
+  }
+
+  function getTotalSpentThisMonth(meId) {
+    var now   = new Date();
+    var year  = now.getFullYear();
+    var mon   = now.getMonth();
+    var total = 0;
+    Object.keys(db.transactions).forEach(function(key) {
+      if (key.indexOf('guthaben__' + meId + '__') !== 0) return;
+      db.transactions[key].forEach(function(e) {
+        var d = new Date(e.createdAt);
+        if (d.getFullYear() === year && d.getMonth() === mon) total += e.amount;
+      });
+    });
+    return total;
+  }
+
+  // ─── Avatar-Builder ──────────────────────────────────────
+  function buildAvatar(profile, size) {
+    size = size || 64;
+    var wrap       = document.createElement('div');
+    wrap.className = 'profile-avatar';
+    wrap.style.width    = size + 'px';
+    wrap.style.height   = size + 'px';
+    wrap.style.fontSize = (size * 0.5) + 'px';
+
+    if (profile.avatarImg) {
+      var img = document.createElement('img');
+      img.src = profile.avatarImg;
+      img.alt = profile.name;
+      wrap.appendChild(img);
+    } else {
+      wrap.textContent = profile.emoji || '🧑';
+    }
+    return wrap;
+  }
+
+  // ─── Benachrichtigungen ──────────────────────────────────
+  function checkNotifications(profileId) {
+    var notifKey = 'notif_' + profileId;
+    var notifs   = [];
+    try { notifs = JSON.parse(localStorage.getItem(notifKey) || '[]'); } catch(e) {}
+    if (notifs.length === 0) return;
+    var latest = notifs[notifs.length - 1];
+    var amt    = Math.abs(latest.net);
+    var msg    = latest.net > 0
+      ? latest.from + ' sagt: Du schuldest ihm/ihr ' + fmtEuro(amt) + '.'
+      : latest.net < 0
+      ? latest.from + ' sagt: Du hast noch ' + fmtEuro(amt) + ' Guthaben.'
+      : latest.from + ': Bilanz ist ausgeglichen.';
+    showToast(msg, 4000);
+    try { localStorage.removeItem(notifKey); } catch(e) {}
+  }
+
+  // ─── App starten ────────────────────────────────────────
+  db = loadDB();
+  renderLoginProfiles();
+  showScreen('login');
+
+}); // Ende DOMContentLoaded
+
+</script>
+</body>
+</html>
